@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>surfwave3d - Donaciones</title>
+    <style>
+        /* Estilos básicos */
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        .donation-container {
+            background-color: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 400px;
+            text-align: center;
+            transition: transform 0.5s ease;
+        }
+
+        h1 {
+            color: #4A90E2;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 1.1em;
+            color: #bbb;
+        }
+
+        /* Botones de donación */
+        .donation-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin: 15px 0;
+        }
+
+        .donation-btn {
+            padding: 10px 20px;
+            font-size: 1em;
+            font-weight: bold;
+            color: #fff;
+            background: linear-gradient(45deg, #4A90E2, #8e44ad);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s ease;
+        }
+
+        .donation-btn:hover {
+            background: linear-gradient(45deg, #8e44ad, #4A90E2);
+            transform: scale(1.1);
+        }
+
+        /* Campo para monto personalizado */
+        .custom-amount {
+            margin-top: 15px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 1em;
+            border: 1px solid #4A90E2;
+            border-radius: 5px;
+            background-color: #2c2c2c;
+            color: #fff;
+            outline: none;
+            text-align: center;
+        }
+
+        /* Botón de donación */
+        .pay-btn {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #fff;
+            background-color: #e67e22;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+        }
+
+        .pay-btn:hover {
+            background-color: #d35400;
+            transform: scale(1.05);
+        }
+
+        /* Efectos para diferentes montos */
+        .effect-low {
+            background-color: #2ecc71;
+            color: #ffffff;
+            animation: glow 1s ease-in-out infinite;
+        }
+
+        .effect-medium {
+            background-color: #f39c12;
+            color: #ffffff;
+            animation: glow 1s ease-in-out infinite;
+        }
+
+        .effect-high {
+            background-color: #e74c3c;
+            color: #ffffff;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        /* Animaciones */
+        @keyframes glow {
+            0% { box-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; }
+            50% { box-shadow: 0 0 20px #2ecc71, 0 0 30px #2ecc71; }
+            100% { box-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        /* Animación de pulgar arriba */
+        .thumb-up {
+            font-size: 50px;
+            color: #2ecc71;
+            animation: thumbUpAnim 1.5s ease-in-out forwards;
+            display: none;
+        }
+
+        @keyframes thumbUpAnim {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Mensaje de agradecimiento */
+        .thank-you-message {
+            display: none;
+            font-size: 1.2em;
+            color: #fff;
+            margin-top: 20px;
+            background-color: #4A90E2;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="donation-container">
+        <h1>Apoya a surfwave3d</h1>
+        <p>Gracias por apoyar nuestro proyecto. Cualquier cantidad es bienvenida y nos ayuda a mejorar el juego.</p>
+
+        <div class="donation-buttons">
+            <button class="donation-btn" onclick="setAmount(5)">5 USD</button>
+            <button class="donation-btn" onclick="setAmount(10)">10 USD</button>
+            <button class="donation-btn" onclick="setAmount(20)">20 USD</button>
+        </div>
+
+        <div class="custom-amount">
+            <input type="number" id="customAmount" placeholder="Otro monto (USD)" min="1" step="1" oninput="clearPresetSelection()">
+        </div>
+
+        <button class="pay-btn" id="payButton" onclick="makeDonation()">Donar</button>
+
+        <!-- Pulgar Arriba -->
+        <div id="thumbUp" class="thumb-up">👍</div>
+
+        <!-- Mensaje de Agradecimiento -->
+        <div id="thankYouMessage" class="thank-you-message">¡Gracias por tu donación! Tu apoyo es invaluable para mejorar surfwave3d.</div>
+    </div>
+
+    <script>
+        let donationAmount = 0;
+
+        function setAmount(amount) {
+            donationAmount = amount;
+            document.getElementById("customAmount").value = ""; // Limpiar campo personalizado
+            updateEffects();
+        }
+
+        function clearPresetSelection() {
+            donationAmount = document.getElementById("customAmount").value;
+            updateEffects();
+        }
+
+        function updateEffects() {
+            // Limpiar efectos previos
+            document.body.classList.remove("effect-low", "effect-medium", "effect-high");
+            const payButton = document.getElementById("payButton");
+
+            if (donationAmount >= 20) {
+                document.body.classList.add("effect-high");
+                payButton.classList.add("effect-high");
+            } else if (donationAmount >= 10) {
+                document.body.classList.add("effect-medium");
+                payButton.classList.add("effect-medium");
+            } else if (donationAmount > 0) {
+                document.body.classList.add("effect-low");
+                payButton.classList.add("effect-low");
+            }
+        }
+
+        function makeDonation() {
+            if (donationAmount <= 0) {
+                alert("Por favor, elige o ingresa un monto válido para donar.");
+                return;
+            }
+
+            // Mostrar animación de pulgar arriba y mensaje de agradecimiento
+            document.getElementById("thumbUp").style.display = 'block';  // Mostrar pulgar arriba
+            document.getElementById("thankYouMessage").style.display = 'block';  // Mostrar mensaje
+
+            // Animación para el pulgar arriba
+            document.getElementById("thumbUp").classList.add('thumb-up');
+
+            // Aquí podrías redirigir a la pasarela de pago (ej. PayPal)
+            alert(`Gracias por tu donación de $${donationAmount} USD. ¡Tu apoyo es muy apreciado!`);
+            // Ejemplo de redirección a PayPal (comentar si no se usará)
+            // window.location.href = `https://www.paypal.com/donate?amount=${donationAmount}`;
+        }
+    </script>
+</body>
+</html>
